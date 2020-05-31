@@ -916,7 +916,7 @@ int main(int argc, char **argv) {
     FD_ZERO(&fdset);
     FD_SET(sock, &fdset);
     /* wait for something to happen on my socket */
-    select(sock + 1, &fdset, NULL, &fdset, &stimeout);
+    select(sock + 1, &fdset, NULL, NULL, &stimeout);
     len = recv(sock, buff, sizeof(buff), MSG_DONTWAIT);
     if (len < 60) continue; /* restart if less than 60 bytes or negative */
     /* validate this is for me (or broadcast) */
