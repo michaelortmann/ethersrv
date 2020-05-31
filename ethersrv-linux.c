@@ -684,13 +684,13 @@ static int raw_sock(const int protocol, const char *const interface, void *const
 
   do {
     memset(&iface, 0, sizeof iface);
-    strncpy((char *)&iface.ifr_name, interface, IFNAMSIZ);
+    strncpy(iface.ifr_name, interface, sizeof iface.ifr_name - 1);
     result = ioctl(socketfd, SIOCGIFINDEX, &iface);
     if (result == -1) break;
     ifindex = iface.ifr_ifindex;
 
     memset(&iface, 0, sizeof(iface));
-    strncpy((char *)&iface.ifr_name, interface, IFNAMSIZ);
+    strncpy(iface.ifr_name, interface, sizeof iface.ifr_name - 1);
     result = ioctl(socketfd, SIOCGIFFLAGS, &iface);
     if (result == -1) break;
     iface.ifr_flags |= IFF_PROMISC;
@@ -698,7 +698,7 @@ static int raw_sock(const int protocol, const char *const interface, void *const
     if (result == -1) break;
 
     memset(&iface, 0, sizeof iface);
-    strncpy((char *)&iface.ifr_name, interface, IFNAMSIZ);
+    strncpy(iface.ifr_name, interface, sizeof iface.ifr_name - 1);
     result = ioctl(socketfd, SIOCGIFHWADDR, &iface);
     if (result == -1) break;
 
