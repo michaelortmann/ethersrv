@@ -207,7 +207,7 @@ static void charreplace(char *s, char rep, char repby) {
 
 
 static int process(struct struct_answcache *answer, unsigned char *reqbuff, int reqbufflen, unsigned char *mymac, char **rootarray) {
-  int query, reqdrv, reqflags;
+  int query, reqdrv; /* reqflags (I don't use flags yet) */
   int reslen = 0;
   unsigned short *ax;     /* pointer to store the value of AX after the query */
   unsigned char *answ;    /* convenience pointer to answer->frame */
@@ -234,8 +234,7 @@ static int process(struct struct_answcache *answer, unsigned char *reqbuff, int 
   /* remember the pointer to the AX result, and fetch reqdrv and AL query */
   ax = (uint16_t *)answ + 29;
   reqdrv = reqbuff[58] & 31; /* 5 lowest -> drive */
-  reqflags = reqbuff[58] >> 5; /* 3 highest bits -> flags */
-  reqflags = reqflags; /* just so the compiler won't complain (I don't use flags yet) */
+  /* reqflags = reqbuff[58] >> 5; 3 highest bits -> flags (I don't use flags yet) */
   query = reqbuff[59];
   /* skip eth headers now, as well as padding, seq, reqdrv and AL */
   reqbuff += 60;
