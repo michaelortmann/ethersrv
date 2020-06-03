@@ -1,0 +1,11 @@
+ethersrv-linux is an implementation of EtherSRV for Linux. It allows a Linux
+computer to share its drive over Ethernet with multiple DOS clients running
+EtherDFS.
+
+This is version 20180203 from http://etherdfs.sourceforge.net/ plus some
+patches by me.
+
+Thanks and Greetings to Mateusz Viste.
+
+Enjoy,
+Michael
