@@ -1,0 +1,3 @@
+The FreeBSD-Binary cant be 'kill'ed, except with 'kill -9' of course, but then
+the /var/run/ethersrv.lock file remains. Maybe it has something to do with our
+blocking read().

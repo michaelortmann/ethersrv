@@ -16,7 +16,9 @@
 #include <string.h>
 #include <time.h>        /* time_t, struct tm... */
 #include <unistd.h>
-#include <linux/msdos_fs.h>
+#ifndef __FreeBSD__
+  #include <linux/msdos_fs.h>
+#endif
 #include <sys/ioctl.h>
 
 #include "debug.h"
@@ -169,8 +171,10 @@ static int matchfile2mask(char *msk, char *fil) {
  * accordingly. returns item's attributes or 0xff on error.
  * DOS attr flags: 1=RO 2=HID 4=SYS 8=VOL 16=DIR 32=ARCH 64=DEVICE */
 unsigned char getitemattr(char *i, struct fileprops *fprops, unsigned char fatflag) {
+#ifndef __FreeBSD__
   uint32_t attr;
   int fd;
+#endif
   struct stat statbuf;
   if (stat(i, &statbuf) != 0) return(0xff); /* error (probably doesn't exist) */
   /* zero out fprops and fill it out */
@@ -195,6 +199,11 @@ unsigned char getitemattr(char *i, struct fileprops *fprops, unsigned char fatfl
   if (fprops != NULL) fprops->fsize = statbuf.st_size;
   /* if not a FAT drive, return a fake attribute of 0x20 (archive) */
   if (fatflag == 0) return(0x20);
+#ifdef __FreeBSD__
+  /* TODO FreeBSD doesnt have ioctl FAT_IOCTL_GET_ATTRIBUTES
+   * The attributes are in <fs/msdosfs/direntry.h> */
+  return(0x20);
+#else
   /* try to fetch DOS attributes by calling the FAT IOCTL API */
   fd = open(i, O_RDONLY);
   if (fd == -1) return(0xff);
@@ -207,9 +216,12 @@ unsigned char getitemattr(char *i, struct fileprops *fprops, unsigned char fatfl
     if (fprops != NULL) fprops->fattr = attr;
     return(attr);
   }
+#endif
 }
 
 /* set attributes fattr on file i. returns 0 on success, non-zero otherwise. */
+#ifndef __FreeBSD__
+/* TODO FreeBSD */
 int setitemattr(char *i, unsigned char fattr) {
   int fd, res;
   fd = open(i, O_RDONLY);
@@ -219,6 +231,7 @@ int setitemattr(char *i, unsigned char fattr) {
   if (res < 0) return(-1);
   return(0);
 }
+#endif
 
 /* generates a directory listing for *root and returns the number of file
  * system entries, or a negative value on error */
@@ -313,9 +326,15 @@ int createfile(struct fileprops *f, char *d, char *fn, unsigned char attr, unsig
   if (fd == NULL) return(-1);
   fclose(fd);
   /* set attribs (only if FAT drive) */
+#ifdef __FreeBSD__
+  /* TODO FreeBSD */
+  if (attr == 42)
+    return(0);
+#else
   if (fatflag != 0) {
     if (setitemattr(fullpath, attr) != 0) fprintf(stderr, "Error: failed to set attribute %02Xh to '%s'\n", attr, fullpath);
   }
+#endif
   /* collect and set attributes */
   getitemattr(fullpath, f, fatflag);
   return(0);
@@ -460,16 +479,23 @@ int renfile(char *fn1, char *fn2) {
 /* checks if a path resides on a FAT filesystem, returns 0 if so, non-zero otherwise */
 int isfat(char *d) {
   int fd;
+#ifndef __FreeBSD__
   uint32_t volid;
+#endif
   /* test if I can fetch the serial id through calling the FAT IOCTL API */
   fd = open(d, O_RDONLY);
   if (fd == -1) return(-1);
+#ifdef __FreeBSD__
+  /* TODO */
+  return(-1);
+#else
   if (ioctl(fd, FAT_IOCTL_GET_VOLUME_ID, &volid) < 0) {
     close(fd);
     return(-1);
   }
   close(fd);
   return(0);
+#endif
 }
 
 /* returns the size of an open file (or -1 on error) */
