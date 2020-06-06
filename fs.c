@@ -1,6 +1,7 @@
 /*
  * This file is part of the ethersrv-linux project
  * Copyright (C) 2017 Mateusz Viste
+ * Copyright (c) 2020 Michael Ortmann
  */
 
 #include <dirent.h>
@@ -16,8 +17,11 @@
 #include <string.h>
 #include <time.h>        /* time_t, struct tm... */
 #include <unistd.h>
-#ifndef __FreeBSD__
+#ifdef __FreeBSD__
+  #include <sys/mount.h> /* struct statfs */
+#else
   #include <linux/msdos_fs.h>
+  #include <sys/vfs.h>   /* struct statfs */
 #endif
 #include <sys/ioctl.h>
 
@@ -478,24 +482,18 @@ int renfile(char *fn1, char *fn2) {
 
 /* checks if a path resides on a FAT filesystem, returns 0 if so, non-zero otherwise */
 int isfat(char *d) {
-  int fd;
-#ifndef __FreeBSD__
-  uint32_t volid;
-#endif
-  /* test if I can fetch the serial id through calling the FAT IOCTL API */
-  fd = open(d, O_RDONLY);
-  if (fd == -1) return(-1);
-#ifdef __FreeBSD__
-  /* TODO */
-  return(-1);
-#else
-  if (ioctl(fd, FAT_IOCTL_GET_VOLUME_ID, &volid) < 0) {
-    close(fd);
+  struct statfs buf;
+  if (statfs(d, &buf) < 0) {
+    DBG("Error: statfs(): %s\n", strerror(errno)); 
     return(-1);
   }
-  close(fd);
-  return(0);
+#ifdef __FreeBSD__
+  if (strcmp(buf.f_fstypename, "msdosfs"))
+#else
+  if (buf.f_type != MSDOS_SUPER_MAGIC)
 #endif
+    return(-1);
+  return(0);
 }
 
 /* returns the size of an open file (or -1 on error) */
