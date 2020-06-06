@@ -18,7 +18,7 @@
 #include <time.h>        /* time_t, struct tm... */
 #include <unistd.h>
 #ifdef __FreeBSD__
-  #include <sys/mount.h> /* struct statfs */
+  #include <sys/mount.h> /* statfs() */
 #else
   #include <linux/msdos_fs.h>
   #include <sys/vfs.h>   /* struct statfs */
@@ -175,8 +175,8 @@ static int matchfile2mask(char *msk, char *fil) {
  * accordingly. returns item's attributes or 0xff on error.
  * DOS attr flags: 1=RO 2=HID 4=SYS 8=VOL 16=DIR 32=ARCH 64=DEVICE */
 unsigned char getitemattr(char *i, struct fileprops *fprops, unsigned char fatflag) {
-#ifndef __FreeBSD__
   uint32_t attr;
+#ifndef __FreeBSD__
   int fd;
 #endif
   struct stat statbuf;
@@ -196,7 +196,7 @@ unsigned char getitemattr(char *i, struct fileprops *fprops, unsigned char fatfl
   }
   /* is this is a directory? */
   if (S_ISDIR(statbuf.st_mode)) {
-    if (fprops != NULL) fprops->fattr = 16;
+    if (fprops != NULL) fprops->fattr = 16; /* ATTR_DIR */
     return(16);
   }
   /* not a directory, set size */
@@ -204,9 +204,17 @@ unsigned char getitemattr(char *i, struct fileprops *fprops, unsigned char fatfl
   /* if not a FAT drive, return a fake attribute of 0x20 (archive) */
   if (fatflag == 0) return(0x20);
 #ifdef __FreeBSD__
-  /* TODO FreeBSD doesnt have ioctl FAT_IOCTL_GET_ATTRIBUTES
-   * The attributes are in <fs/msdosfs/direntry.h> */
-  return(0x20);
+  {
+    /* map FreeBSD to Linux*/
+    attr = 0;
+    if (statbuf.st_flags & UF_READONLY)
+      attr |= 1;  /* ATTR_RO */
+    if (statbuf.st_flags & UF_HIDDEN)
+      attr |= 2;  /* ATTR_HIDDEN */
+    if (statbuf.st_flags & UF_SYSTEM)
+      attr |= 4;  /* ATTR_SYS */
+    if (statbuf.st_flags & UF_ARCHIVE)
+      attr |= 32; /* ATTR_ARCH */
 #else
   /* try to fetch DOS attributes by calling the FAT IOCTL API */
   fd = open(i, O_RDONLY);
@@ -217,10 +225,10 @@ unsigned char getitemattr(char *i, struct fileprops *fprops, unsigned char fatfl
     return(0);
   } else {
     close(fd);
+#endif
     if (fprops != NULL) fprops->fattr = attr;
     return(attr);
   }
-#endif
 }
 
 /* set attributes fattr on file i. returns 0 on success, non-zero otherwise. */
