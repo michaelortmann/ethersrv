@@ -452,10 +452,7 @@ static int process(struct struct_answcache *answer, unsigned char *reqbuff, int 
     DBG("SETATTR [file: '%s', attr: 0x%02X]\n", fname, fattr);
     /* set attr, but only if drive is FAT */
     if (drivesfat[reqdrv] != 0) {
-#ifndef __FreeBSD__
-      if (setitemattr(fname, fattr) != 0)
-#endif
-        *ax = 2;
+      if (setitemattr(fname, fattr) != 0)  *ax = 2;
     }
   } else if ((query == AL_GETATTR) && (reqbufflen > 0)) { /* AL_GETATTR (0x0F) */
     char fname[512];

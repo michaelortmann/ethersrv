@@ -205,7 +205,7 @@ unsigned char getitemattr(char *i, struct fileprops *fprops, unsigned char fatfl
   if (fatflag == 0) return(0x20);
 #ifdef __FreeBSD__
   {
-    /* map FreeBSD to Linux*/
+    /* map FreeBSD to Linux */
     attr = 0;
     if (statbuf.st_flags & UF_READONLY)
       attr |= 1;  /* ATTR_RO */
@@ -232,18 +232,29 @@ unsigned char getitemattr(char *i, struct fileprops *fprops, unsigned char fatfl
 }
 
 /* set attributes fattr on file i. returns 0 on success, non-zero otherwise. */
-#ifndef __FreeBSD__
-/* TODO FreeBSD */
 int setitemattr(char *i, unsigned char fattr) {
-  int fd, res;
-  fd = open(i, O_RDONLY);
+  int res;
+#ifdef __FreeBSD__
+  /* map Linux to FreeBSD */
+  unsigned long flags = 0;
+  if (fattr & 1)  /* ATTR_RO */
+    flags |= UF_READONLY;
+  if (fattr & 2)  /* ATTR_HIDDEN */
+    flags |= UF_HIDDEN;
+  if (fattr & 4)  /* ATTR_SYS */
+    flags |= UF_SYSTEM;
+  if (fattr & 32) /* ATTR_ARCH */
+    flags |= UF_ARCHIVE;
+  res = chflags(i, flags);
+#else
+  int fd = open(i, O_RDONLY);
   if (fd == -1) return(-1);
   res = ioctl(fd, FAT_IOCTL_SET_ATTRIBUTES, &fattr);
   close(fd);
+#endif
   if (res < 0) return(-1);
   return(0);
 }
-#endif
 
 /* generates a directory listing for *root and returns the number of file
  * system entries, or a negative value on error */
@@ -338,15 +349,9 @@ int createfile(struct fileprops *f, char *d, char *fn, unsigned char attr, unsig
   if (fd == NULL) return(-1);
   fclose(fd);
   /* set attribs (only if FAT drive) */
-#ifdef __FreeBSD__
-  /* TODO FreeBSD */
-  if (attr == 42)
-    return(0);
-#else
   if (fatflag != 0) {
     if (setitemattr(fullpath, attr) != 0) fprintf(stderr, "Error: failed to set attribute %02Xh to '%s'\n", attr, fullpath);
   }
-#endif
   /* collect and set attributes */
   getitemattr(fullpath, f, fatflag);
   return(0);

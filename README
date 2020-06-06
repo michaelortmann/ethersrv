@@ -3,8 +3,20 @@ Linux or FreeBSD computer to share its drive over Ethernet with multiple DOS
 clients running EtherDFS.
 
 This is version 20180203 from http://etherdfs.sourceforge.net/ plus FreeBSD port
-and some other patches by me. The FreeBSD port works, but file attributes are
-more or less not working yet.
+and some other patches by me.
+
+FreeBSD example:
+
+  $ su
+  [...]
+  $ mdconfig -f /home/michael/floppy.img -u 0
+  $ mount -t msdosfs /dev/md0 /mnt
+  # ./ethersrv -f em0 /mnt
+  Listening on 'em0' [...]
+  Drive C: mapped to /mnt
+  # ls -lo /mnt
+  [...]
+  -r-xr-xr-x  1 michael  wheel  hidden,rdonly,system      7 Jun  6 10:41 test.txt
 
 Thanks and Greetings to Mateusz Viste.
 
