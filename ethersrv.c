@@ -118,7 +118,7 @@ static unsigned char drivesfat[26]; /* 0 if not, non-zero otherwise */
 /* the flag is set when ethersrv is expected to terminate */
 static sig_atomic_t volatile terminationflag = 0;
 
-void sigcatcher(int sig) {
+static void sigcatcher(int sig) {
   switch (sig) {
     case SIGTERM:
     case SIGQUIT:
@@ -1013,6 +1013,15 @@ int main(int argc, char **argv) {
 
   /* main loop */
   while (terminationflag == 0) {
+    struct timeval stimeout = {10, 0}; /* set timeout to 10s */
+    /* prepare the set of descriptors to be monitored later through select() */
+    fd_set fdset;
+    FD_ZERO(&fdset);
+    FD_SET(sock, &fdset);
+    /* wait for something to happen on my socket */
+    select(sock + 1, &fdset, NULL, NULL, &stimeout);
+    if (terminationflag)
+      break;
 #ifdef __FreeBSD__
     if ((len = read(sock, bpf_buf, bpf_len)) < (int) sizeof (struct bpf_hdr)) {
       DBG("ERROR: read()\n");
@@ -1021,13 +1030,6 @@ int main(int argc, char **argv) {
     bf_hdr = (struct bpf_hdr *) bpf_buf;
     buff = bpf_buf + bf_hdr->bh_hdrlen;
 #else
-    struct timeval stimeout = {10, 0}; /* set timeout to 10s */
-    /* prepare the set of descriptors to be monitored later through select() */
-    fd_set fdset;
-    FD_ZERO(&fdset);
-    FD_SET(sock, &fdset);
-    /* wait for something to happen on my socket */
-    select(sock + 1, &fdset, NULL, NULL, &stimeout);
     len = recv(sock, buff, BUFF_LEN, MSG_DONTWAIT);
 #endif
     if (len < 60) continue; /* restart if less than 60 bytes or negative */
