@@ -447,6 +447,7 @@ int delfiles(char *pattern) {
   char filfcb[12];
   struct dirent *diridx;
   DIR *dp;
+  char fname[sizeof patterncopy + sizeof diridx->d_name];
   /* scan the pattern for '?' characters, and find where the file part starts, also copy the pattern to patterncopy[] */
   for (i = 0; pattern[i] != 0; i++) {
     if (pattern[i] == '?') ispattern = 1;
@@ -478,8 +479,7 @@ int delfiles(char *pattern) {
     /* if match, delete the file and continue */
     filename2fcb(dirnamefcb, diridx->d_name);
     if (matchfile2mask(filfcb, dirnamefcb) == 0) {
-      char fname[512];
-      sprintf(fname, "%s/%s", dir, diridx->d_name);
+      snprintf(fname, sizeof fname, "%s/%s", dir, diridx->d_name);
       if (unlink(fname) != 0) fprintf(stderr, "failed to delete '%s'\n", fname);
     }
   }
