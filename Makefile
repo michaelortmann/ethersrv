@@ -6,7 +6,7 @@
 # Copyright (c) 2020 Michael Ortmann
 #
 
-CFLAGS := -O2 -Wall -std=gnu89 -pedantic -Wextra -s -Wno-long-long -Wno-variadic-macros -Wformat-security -D_FORTIFY_SOURCE=1 $(CFLAGS)
+CFLAGS := -O2 -Wall -std=gnu89 -pedantic -Wextra -s -Wno-long-long -Wno-variadic-macros -Wformat-security $(CFLAGS)
 
 CC ?= gcc
 
