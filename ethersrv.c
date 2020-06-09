@@ -41,8 +41,8 @@
   #include <sys/sysctl.h>
 #else
   #include <endian.h>        /* le16toh(), le32toh() */
-  #include <linux/if_packet.h>
   #include <net/ethernet.h>
+  #include <netpacket/packet.h> /* sockaddr_ll */
 #endif
 #include <limits.h>          /* PATH_MAX and such */
 #include <net/if.h>
