@@ -1,26 +1,26 @@
 
-            ethersrv-linux Copyright (C) 2017, 2018 Mateusz Viste
+    ethersrv Copyright (C) 2017, 2018 Mateusz Viste, 2020 Michael Ortmann
                        http://etherdfs.sourceforge.net
 
 
-ethersrv-linux is an implementation of EtherSRV for Linux. It allows a Linux
+ethersrv is an implementation of EtherSRV for Linux. It allows a Linux
 computer to share its drive over Ethernet with multiple DOS clients running
 EtherDFS.
 
 Requirements:
-ethersrv-linux requires a fairly recent Linux operating system to run, and gcc
-to compile.
+  FreeBSD or Linux 2.6.12+ (FAT_IOCTL_GET_ATTRIBUTES)
+  Clang or GCC
 
 How to build:
-just type 'make', then an 'ethersrv-linux' binary should appear (unless things
-go wrong).
+just type 'make', then an 'ethersrv' binary should appear (unless things go
+wrong).
 
 How to run:
-ethersrv-linux [options] iface directory [directory2] ... [directoryN]
+ethersrv [options] iface directory [directory2] ... [directoryN]
 
-Note that, in order to be able to operate on ethernet sockets, ethersrv-linux
-needs to have the CAP_NEW_RAW system capability. Usually this means that you
-have to run it as root.
+Note that, in order to be able to operate on ethernet sockets, ethersrv needs
+to have the CAP_NEW_RAW system capability. Usually this means that you have to
+run it as root.
 
 where:
  'iface'     is the name of the network interface you wish to hook ethersrv to
@@ -35,7 +35,7 @@ available options:
 
 
 Notes:
- * it is HIGHLY recommended to run ethersrv-linux over a FAT filesystem.
+ * it is HIGHLY recommended to run ethersrv over a FAT filesystem.
    Other file systems might work, too, but FAT attributes will be unavailable
    and DOS might get puzzled with upper/lower case filenames. The presence
    and/or order of '.' and '..' directory entries might also end up being
@@ -59,10 +59,10 @@ Notes:
 
 ===[ License ]================================================================
 
-ethersrv-linux is distributed under the terms of the MIT License, as listed
-below.
+ethersrv is distributed under the terms of the MIT License, as listed below.
 
 Copyright (C) 2017, 2018 Mateusz Viste
+Copyright (c) 2020 Michael Ortmann
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -1,5 +1,5 @@
 /*
- * This file is part of the ethersrv-linux project
+ * This file is part of the ethersrv project
  * Copyright (C) 2017 Mateusz Viste
  * Copyright (c) 2020 Michael Ortmann
  */
@@ -29,9 +29,9 @@
 #include "fs.h" /* include self for control */
 
 /* database containing file/dir identifiers and their names - this is used
- * whenever ethersrv-linux needs to provide etherdfs with a 16bit identifier
- * that etherdfs will subsequently use to refer to this file or dir (typically
- * used during FindFirst+FindNext steps and Open/Create+Write/Read.
+ * whenever ethersrv needs to provide etherdfs with a 16bit identifier that
+ * etherdfs will subsequently use to refer to this file or dir (typically used
+ * during FindFirst+FindNext steps and Open/Create+Write/Read.
  * the struct may also contain an entire directory listing computed by FFirst
  * (and used then by FNext) */
 static struct sfsdb {

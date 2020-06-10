@@ -1,11 +1,10 @@
 /*
- * ethersrv-linux is serving files through the EtherDFS protocol. Runs on
- * Linux.
+ * ethersrv is serving files through the EtherDFS protocol. Runs on FreeBSD
+ * and Linux.
  *
  * http://etherdfs.sourceforge.net
  *
- * ethersrv-linux is distributed under the terms of the MIT License, as listed
- * below.
+ * ethersrv is distributed under the terms of the MIT License, as listed below.
  *
  * Copyright (C) 2017, 2018 Mateusz Viste
  * Copyright (c) 2020 Michael Ortmann
@@ -61,7 +60,7 @@
 #include "lock.h"
 
 /* program version */
-#define PVER "20170415FreeBSD20200604"
+#define PVER "20180203m"
 
 #define ETHERTYPE_DFS 0xEDF5
 
@@ -870,10 +869,10 @@ static unsigned short bsdsum(unsigned char *ptr, unsigned short l) {
 }
 
 static void help(void) {
-  printf("ethersrv-linux version " PVER " | Copyright (C) 2017, 2018 Mateusz Viste\n"
+  printf("ethersrv version " PVER " | Copyright (C) 2017, 2018 Mateusz Viste, 2020 Michael Ortmann\n"
          "http://etherdfs.sourceforge.net\n"
          "\n"
-         "usage: ethersrv-linux [options] interface rootpath1 [rootpath2] ... [rootpathN]\n"
+         "usage: ethersrv [options] interface rootpath1 [rootpath2] ... [rootpathN]\n"
          "\n"
          "Options:\n"
          "  -f        Keep in foreground (do not daemonize)\n"
@@ -965,7 +964,7 @@ int main(int argc, char **argv) {
   if (sock == -1) {
     fprintf(stderr, "Error: failed to open socket (%s)\n"
                     "\n"
-                    "Usually ethersrv-linux requires to be launched as root to\n"
+                    "Usually ethersrv requires to be launched as root to\n"
                     "be able to handle raw (ethernet) sockets. Are you root?\n", strerror(errno));
     return(1);
   }

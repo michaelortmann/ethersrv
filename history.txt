@@ -1,5 +1,10 @@
-History file of ethersrv-linux
+History file of ethersrv
 
+20200609
+ - renamed from ethersrv-linux to ethersrv
+ - ported to musl / Alpine Linux
+ - ported to FreeBSD
+ - enhanced CC and CFLAGS handling
 20180203:
  - fixed file truncation when writing to offset 0 (patch by Peter De Wachter),
  - added the '-f' option (patch by Philip Linde),
