@@ -168,7 +168,7 @@ static struct struct_answcache *findcacheentry(unsigned char *clientmac) {
 }
 
 
-/* checks wheter dir is belonging to the root directory. returns 0 if so, 1
+/* checks whether dir is belonging to the root directory. returns 0 if so, 1
  * otherwise */
 static int isroot(char *root, char *dir) {
   /* fast-forward to the 'virtual directory' part */
@@ -280,7 +280,7 @@ static int process(struct struct_answcache *answer, unsigned char *reqbuff, int 
     if (diskspace >= 2lu*1024*1024*1024) diskspace = 2lu*1024*1024*1024 - 1;
     if (freespace >= 2lu*1024*1024*1024) freespace = 2lu*1024*1024*1024 - 1;
     DBG("TOTAL: %llu KiB ; FREE: %llu KiB\n", diskspace >> 10, freespace >> 10);
-    *ax = 1; /* AX: media id (8 bits) | sectors per cluster (8 bits) -- MSDOS tolerates only 1 here! */
+    *ax = 1; /* AX: media id (8 bits) | sectors per cluster (8 bits) -- MS-DOS tolerates only 1 here! */
     wansw[1] = htole16(32768);  /* CX: bytes per sector */
     diskspace >>= 15; /* space to number of 32K clusters */
     freespace >>= 15; /* space to number of 32K clusters */
@@ -1052,7 +1052,7 @@ int main(int argc, char **argv) {
     } else if (edf5framelen < 60) { /* obvious error */
       fprintf(stderr, "Error: received a malformed frame from %s\n", printmac(buff + 6));
       continue;
-    } else { /* edf5framelen seems sane, use it instead of the Ethernet lenght */
+    } else { /* edf5framelen seems sane, use it instead of the Ethernet length */
       #if DEBUG > 0
         if (len != edf5framelen) {
           DBG("Note: Received frame with padding from %s (edf5len = %u, ethernet len = %u)\n", printmac(buff + 6), edf5framelen, len);
