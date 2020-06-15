@@ -1122,7 +1122,7 @@ int main(int argc, char **argv) {
       dumpframe(cacheptr->frame, len);
   #endif
 #ifdef __FreeBSD__
-      i = write(sock, cacheptr->frame, len) ;
+      i = write(sock, cacheptr->frame, len);
       if (i < 0) {
         fprintf(stderr, "ERROR: write() returned %d (%s)\n", i, strerror(errno));
       } else if (i != len) {
