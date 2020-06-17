@@ -682,7 +682,7 @@ static int process(struct struct_answcache *answer, unsigned char *reqbuff, int 
 
 static int raw_sock(const char *const interface, void *const hwaddr) {
   struct ifreq iface;
-  int socketfd;
+  int socketfd, fl;
 #ifdef __FreeBSD__
   #define PATH_BPF "/dev/bpf"
   int i = 0;
@@ -795,6 +795,17 @@ static int raw_sock(const char *const interface, void *const hwaddr) {
 
     errno = 0;
 #endif
+    /* unblock socket, better safe than sorry */ 
+    if ((fl = fcntl(socketfd, F_GETFL)) < 0) {
+      DBG("ERROR: fcntl(): %s\n", strerror(errno));
+      break;
+    }
+    fl |= O_NONBLOCK;
+    if ((fl = fcntl(socketfd, F_SETFL, fl)) < 0) {
+      DBG("ERROR: fcntl(): %s\n", strerror(errno));
+      break;
+    }
+
     return(socketfd);
   } while (0);
 
@@ -908,7 +919,7 @@ static char *printmac(unsigned char *b) {
 
 
 int main(int argc, char **argv) {
-  int sock, len, i;
+  int sock, len, i, r;
   unsigned char *buff;
   unsigned char cksumflag;
   unsigned short edf5framelen;
@@ -1008,19 +1019,31 @@ int main(int argc, char **argv) {
 #endif
 
   /* main loop */
-  while (terminationflag == 0) {
+  while (1) {
+#if DEBUG > 0
     struct timeval stimeout = {10, 0}; /* set timeout to 10s */
+#endif
     /* prepare the set of descriptors to be monitored later through select() */
     fd_set fdset;
     FD_ZERO(&fdset);
     FD_SET(sock, &fdset);
     /* wait for something to happen on my socket */
-    select(sock + 1, &fdset, NULL, NULL, &stimeout);
-    if (terminationflag)
-      break;
+#if DEBUG > 0
+    r = select(sock + 1, &fdset, NULL, NULL, &stimeout);
+#else
+    r = select(sock + 1, &fdset, NULL, NULL, NULL);
+#endif
+    if (!r)
+      continue; /* timeout / heartbeat */
+    if (r < 0) {
+      if (terminationflag)
+        break;
+      DBG("ERROR: select(): %s\n", strerror(errno));
+      continue;
+    }
 #ifdef __FreeBSD__
     if ((len = read(sock, bpf_buf, bpf_len)) < (int) sizeof (struct bpf_hdr)) {
-      DBG("ERROR: read()\n");
+      DBG("ERROR: read(): %s\n", strerror(errno));
       continue;
     }
     bf_hdr = (struct bpf_hdr *) bpf_buf;
