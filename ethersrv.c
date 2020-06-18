@@ -30,8 +30,8 @@
 
 #include <arpa/inet.h>       /* htons() */
 #include <errno.h>
+#include <fcntl.h>           /* fcntl(), open() */
 #ifdef __FreeBSD__
-  #include <fcntl.h>         /* open() */
   #include <sys/types.h>     /* u_int32_t */
   #include <net/bpf.h>       /* BIOCSETIF */
   #include <net/ethernet.h>  /* ETHER_ADDR_LEN */
