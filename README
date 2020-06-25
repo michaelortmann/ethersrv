@@ -1,9 +1,9 @@
 ethersrv is an implementation of EtherSRV for FreeBSD and Linux. It allows a
-Linux or FreeBSD computer to share its drive over Ethernet with multiple DOS
+FreeBSD or Linux computer to share its drive over Ethernet with multiple DOS
 clients running EtherDFS.
 
-This is version 20180203 from http://etherdfs.sourceforge.net/ plus FreeBSD
-port and some other patches by me.
+This is version 20180203 from http://etherdfs.sourceforge.net plus FreeBSD
+port, musl / Alpine Linux port and some other patches by me.
 
 FreeBSD example:
 
@@ -17,6 +17,17 @@ FreeBSD example:
   # ls -lo /mnt
   [...]
   -r-xr-xr-x  1 michael  wheel  hidden,rdonly,system      7 Jun  6 10:41 test.txt
+
+License:
+
+  MIT License
+  Copyright (C) 2017, 2018 Mateusz Viste
+  Copyright (c) 2020 Michael Ortmann
+
+Website:
+
+  https://gitlab.com/mortmann/ethersrv
+  http://etherdfs.sourceforge.net
 
 Thanks and Greetings to Mateusz Viste.
 
